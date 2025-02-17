@@ -1,6 +1,6 @@
 # BaseTypes.NET
 
-BaseTypes.NET is a small but useful library containing fundamental types for object-oriented programming and domain-driven design (DDD).
+BaseTypes.NET is a lightweight library containing fundamental types for object-oriented programming and domain-driven design (DDD).
 
 ## 📌 Available Types:
 - `Entity<TId>` – A base class for entities that have a unique identity throughout their lifecycle. Entities are distinguished by their identifier (`Id`), even if their properties change. They are commonly used to model real-world objects in domain-driven design (DDD).
