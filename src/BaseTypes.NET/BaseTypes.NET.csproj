@@ -5,4 +5,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Igor Bzovsky</Authors>
+    <Company>YourCompany</Company>
+    <Description>A lightweight library for base types in DDD.</Description>
+    <PackageTags>Entity;ValueObject;Enumeration;Unit;Error</PackageTags>
+    <RepositoryUrl>https://github.com/igor-bzovsky/BaseTypes.NET</RepositoryUrl>
+  </PropertyGroup>
+
 </Project>
