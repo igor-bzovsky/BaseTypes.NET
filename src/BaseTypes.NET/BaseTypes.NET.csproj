@@ -12,6 +12,8 @@
     <Description>A lightweight library for base types in DDD.</Description>
     <PackageTags>Entity;ValueObject;Enumeration;Unit;Error</PackageTags>
     <RepositoryUrl>https://github.com/igor-bzovsky/BaseTypes.NET</RepositoryUrl>
+    <License>MIT</License>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>
