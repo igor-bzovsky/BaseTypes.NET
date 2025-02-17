@@ -1,13 +1,13 @@
 # BaseTypes.NET
 
-BaseTypes.NET is a small but useful library containing fundamental types for object-oriented and domain-driven design (DDD).
+BaseTypes.NET is a small but useful library containing fundamental types for object-oriented programming and domain-driven design (DDD).
 
 ## 📌 Available Types:
-- `Entity<TId>` – A base class for entities with a unique identifier.
-- `ValueObject` – A value object class without an identifier.
-- `Enumeration` – A base class for representing strongly-typed enumerations.
-- `Unit` – A type representing an absence of a meaningful result, often used in functional programming.
-- `Error` – A structured representation of an error.
+- `Entity<TId>` – A base class for entities that have a unique identity throughout their lifecycle. Entities are distinguished by their identifier (`Id`), even if their properties change. They are commonly used to model real-world objects in domain-driven design (DDD).
+- `ValueObject` – A base class for objects that do not have an identity but are defined by their attributes. Two `ValueObject` instances are considered equal if all their attributes match. They are immutable and useful for modeling concepts like monetary amounts, dates, or measurement units.
+- `Enumeration` – A base class for representing named instances with assigned values, providing an alternative to traditional enums.
+- `Unit` – A type representing an absence of a meaningful result, often used in functional programming to indicate the completion of a task without returning a value.
+- `Error` – A structured representation of an error, encapsulating an error code and message to provide more meaningful failure handling.
 
 ## 🔍 Entity vs. ValueObject
 ### **Entity<TId>**
@@ -69,7 +69,20 @@ Console.WriteLine(money1 == money2); // true, as values are identical
 Console.WriteLine(money1 == money3); // false, since Amount is different
 ```
 
-## ⚖️ How Equals Works
+## ⚖️ Equals Implementation
+### **Why Implement IEquatable<T>?**
+Both `Entity<TId>` and `ValueObject` implement `IEquatable<T>`, which provides optimized equality checks. This has several benefits:
+
+1. **Improved Performance:** 
+   - `IEquatable<T>` allows for direct comparison without boxing/unboxing (avoiding unnecessary object conversions).
+   - More efficient in **collections** like `HashSet<T>` or `Dictionary<TKey, TValue>` where frequent equality checks occur.
+
+2. **Type Safety:**
+   - Ensures type-safe equality comparisons, preventing incorrect comparisons between unrelated types.
+
+3. **Better Integration with .NET Collections:**
+   - `IEquatable<T>` is used internally in many .NET APIs (e.g., LINQ operations, collections), ensuring consistent equality handling.
+
 ### **Entity Equals Implementation**
 Entities implement equality by comparing their **ID**:
 ```csharp
@@ -97,6 +110,89 @@ private bool EqualsCore(ValueObject other)
 - If **all** attributes match, the objects are considered equal.
 - This approach makes value objects **immutable and interchangeable**.
 
+## 🔢 Enumeration
+`Enumeration` is a base class for strongly-typed enumerations, offering more flexibility than built-in `enum` types. Unlike standard enums, Enumeration allows defining named instances with associated values and provides methods for retrieving and comparing them.
+
+#### **Key Characteristics:**
+- Allows creation of new enumerations and enumeration fields at runtime, offering greater flexibility.
+- Provides methods for retrieving instances by value or display name.
+- Implements equality and comparison logic. Compared by `Value` (not `DisplayName`).
+
+### **Example:**
+```csharp
+public class OrderStatus : Enumeration
+{
+    public static readonly OrderStatus Pending = new(1, "Pending");
+    public static readonly OrderStatus Shipped = new(2, "Shipped");
+    public static readonly OrderStatus Delivered = new(3, "Delivered");
+    
+    private OrderStatus(int value, string displayName) : base(value, displayName) {}
+}
+```
+#### **Usage Example:**
+```csharp
+// Retrieve all available statuses
+var statuses = Enumeration.GetAll<OrderStatus>();
+foreach (var status in statuses)
+{
+    Console.WriteLine($"{status.Value}: {status.DisplayName}");
+}
+
+// Get a status by its value
+var shippedStatus = Enumeration.GetByValue<OrderStatus>(2);
+Console.WriteLine(shippedStatus.DisplayName); // Output: Shipped
+
+// Get a status by its display name
+var deliveredStatus = Enumeration.GetByDisplayName<OrderStatus>("Delivered");
+Console.WriteLine(deliveredStatus.Value); // Output: 3
+
+// Compare enumeration values
+if (OrderStatus.Pending != OrderStatus.Shipped)
+{
+    Console.WriteLine("Different statuses");
+}
+```
+
+## ❗ Error
+`Error` is a value object that represents an error message with a specific error code. 
+
+#### **Key Characteristics:**
+- Provides structured error handling.
+- Can be used for returning meaningful failure states.
+
+#### **Example:**
+```csharp
+public static class Errors
+{
+    public static readonly Error NotFound = new("404", "Resource not found");
+    public static readonly Error ValidationError = new("400", "Invalid input provided");
+}
+```
+
+## 🏳️ Unit
+`Unit` is a struct representing a "void" return type, commonly used in functional programming.
+
+#### **Key Characteristics:**
+- Useful for functional constructs where a return value is required but not meaningful.
+- Prevents the use of `null` in method chaining.
+
+#### **Example:**
+```csharp
+public Task<Unit> SaveChangesAsync()
+{
+    return Task.FromResult(Unit.value);
+}
+```
+
+### **Unit Extensions**
+```csharp
+public static async Task<Unit> AsUnitTask(this Task task)
+{
+    await task;
+    return Unit.value;
+}
+```
+
 ## 🚀 Installation
 You can install the package via NuGet:
 ```sh
@@ -112,5 +208,4 @@ BaseTypes.NET is licensed under the MIT License. See the [LICENSE](LICENSE) file
 
 ## 🤝 Contributing
 Contributions are welcome! Feel free to open an issue or submit a pull request.
-
 
